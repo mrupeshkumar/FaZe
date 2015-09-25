@@ -117,8 +117,10 @@ bool vec_isnan(std::vector<double>& vec) {
 	return (1-f);
 }
 
-void compute_eye_gaze (Face face, dlib::full_object_detection shape, cv::Rect rect, cv::Point pupil, double mag_CP, double mag_LR, double mag_CR, double mag_CM, double theta, int mode, std::vector<double>& vec_CP) {
+void compute_eye_gaze (Face face, dlib::full_object_detection shape, cv::Point pupil, double mag_CP, double mag_LR, double mag_CR, double mag_CM, double theta, int mode, std::vector<double>& vec_CP) {
 
+
+	cv::Rect rect = cv::boundingRect(face.getDescriptors());
 	std::vector<double> vec_LR_u(3), vec_RP(3), vec_CR_u(3), vec_CM_u(3), vec_UD_u(3);
 	std::vector<double> vec_CP_l(3), vec_CP_r(3);
 	double S2R = get_conversion_factor(shape, face, mag_CM, mode);

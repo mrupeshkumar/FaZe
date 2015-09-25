@@ -8,7 +8,8 @@ private:
 	double Rm = 0.5;
 
 	double MAG_NOR = 12.0;
-	double ALPHA = 30.0
+	double MAG_CR = 12.0, MAG_LR = 30.0, MAG_CP = 13.101, MAG_CM = 13.101;
+	double ALPHA = 30.0, THETA = 1.97920337176;
 
 	full_object_detection faceShape;
 	cv::Point origin = cv::Point(0,0);

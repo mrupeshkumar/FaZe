@@ -18,13 +18,13 @@ std::vector<double> computeGazeVA(Face face, double alpha, double magNor) {
 	std::vector<double> vec_ep_pos_l(3), vec_ep_pos_r(3);
 	std::vector<double> vec_cp_pos_l(3), vec_cp_pos_r(3), vec_cp_pos(3);
 
-	Cf_left = get_conversion_factor(face.shape, face.normal, alpha, 1);
-	Cf_right = get_conversion_factor(face.shape, face.normal, alpha, 2);
+	Cf_left = get_conversion_factor(face.getShape(), face.normal, alpha, 1);
+	Cf_right = get_conversion_factor(face.getShape(), face.normal, alpha, 2);
 
-	cv::Point pt_e_pos_l = get_mid_point(cv::Point(face.shape.part(42).x(), face.shape.part(42).y()),
-		cv::Point(face.shape.part(45).x(), face.shape.part(45).y()));
-	cv::Point pt_e_pos_r = get_mid_point(cv::Point(face.shape.part(36).x(), face.shape.part(36).y()),
-		cv::Point(face.shape.part(39).x(), face.shape.part(39).y()));
+	cv::Point pt_e_pos_l = get_mid_point(cv::Point(face.getShape().part(42).x(), face.getShape().part(42).y()),
+		cv::Point(face.getShape().part(45).x(), face.getShape().part(45).y()));
+	cv::Point pt_e_pos_r = get_mid_point(cv::Point(face.getShape().part(36).x(), face.getShape().part(36).y()),
+		cv::Point(face.getShape().part(39).x(), face.getShape().part(39).y()));
 
 	vec_ep_pos_l[0] = face.descriptors[0].x - pt_e_pos_l.x;
 	vec_ep_pos_l[1] = face.descriptors[0].y - pt_e_pos_l.y;

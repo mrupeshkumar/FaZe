@@ -7,6 +7,9 @@ private:
 	double Rn = 0.5;
 	double Rm = 0.5;
 
+	double MAG_NOR = 12.0;
+	double ALPHA = 30.0
+
 	full_object_detection faceShape;
 	cv::Point origin = cv::Point(0,0);
 
@@ -42,7 +45,7 @@ public:
 	static const int ORIGIN_FACE_CENTRE = 1;
 
     void assign(full_object_detection shape);
-    
+
     cv::Point getPupil(int mode);
     std::vector<cv::Point> getDescriptors(int index);
     std::vector<double> getGaze();

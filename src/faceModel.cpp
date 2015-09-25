@@ -104,7 +104,14 @@ void faceModel::computeNormal() {
 }
 
 void computeGaze(int mode) {
-
+	assert(mode == MODE_GAZE_VA || mode == MODE_GAZE_QE);
+	if(mode == MODE_GAZE_GE) {
+		// TODO : fill this
+		computeGazeGE();
+	}
+	else {
+		computeGazeVA(this, ALPHA, MAG_NORMAL);
+	}
 }
 
 void faceModel::setOrigin(cv::Point origin) {

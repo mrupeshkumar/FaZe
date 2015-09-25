@@ -56,12 +56,12 @@ void faceModel::assign(full_object_detection shape , cv::Mat image, int modePupi
 void faceModel::computePupil(int mode) {
 	assert(mode == MODE_PUPIL_SP || mode == MODE_PUPIL_CDF);
 
-	std::vector<cv::Point> leftEyePoints = getFeatureDescriptors(INDEX_LEFT_EYE);
+	std::vector<cv::Point> leftEyePoints = getDescriptors(INDEX_LEFT_EYE);
 	rectLeftEye = cv::boundingRect(leftEyePoints);
 	roiLeftEye = inputImage(rectLeftEye);
 	preprocessROI(roiLeftEye);
 
-	std::vector<cv::Point> rightEyePoints = getFeatureDescriptors(INDEX_RIGHT_EYE);
+	std::vector<cv::Point> rightEyePoints = getDescriptors(INDEX_RIGHT_EYE);
 	rectRightEye = cv::boundingRect(rightEyePoints);
 	roiRightEye = inputImage(rectRightEye);
 	preprocessROI(roiRightEye);
@@ -152,7 +152,7 @@ std::vector<double> getGaze() {
 	return gaze;
 }
 
-std::vector<cv::Point> faceModel::getDescriptors(int index) {
+std::vector<cv::Point> faceModel::getIntermediateDescriptors(int index) {
 	assert(index == INDEX_LEFT_EYE || index == INDEX_RIGHT_EYE || index == INDEX_LEFT_EYE_BROW || index == INDEX_RIGHT_EYE_BROW 
 		|| index == INDEX_NOSE_UPPER || index == INDEX_NOSE_LOWER || index == INDEX_MOUTH_OUTER || index == INDEX_MOUTH_INNER); 
 
@@ -212,4 +212,18 @@ std::vector<cv::Point> faceModel::getDescriptors(int index) {
 		}
 		return mouthInnerPoints;
 	}
+}
+
+void relativeToOrigin(std::vector<cv::Point>& vec) {
+	vec[0] -= origin.x;
+	vec[1] -= origin.y;
+	vec[2] -= 0.0;
+}
+
+std::vector<cv::Point> faceModel::getDescriptors(int index, int mode = DESCRIPTOR_GLOBAL) {
+	assert(mode == DESCRIPTOR_GLOBAL || mode == DESCRIPTOR_LOCAL);
+	std::vector<cv::Point> vec = getIntermediateDescriptors(index);
+	if(mode == DESCRIPTOR_LOCAL)
+		relativeToOrigin(vec);
+	return vec;
 }

@@ -26,6 +26,7 @@ private:
 	void computePupil(int mode);
 	void computeNormal();
 	void computeGaze(int mode);
+    std::vector<cv::Point> getIntermediateDescriptors(int index);
 
 public:
 	static const int MODE_PUPIL_SP = 0;
@@ -48,10 +49,13 @@ public:
 	static const int ORIGIN_IMAGE = 0;
 	static const int ORIGIN_FACE_CENTRE = 1;
 
+	static const int DESCRIPTOR_GLOBAL = 0;
+	static const int DESCRIPTOR_LOCAL = 1;
+
     void assign(full_object_detection shape, cv::Mat image, int modePupil, int modeGaze);
 
     cv::Point getPupil(int mode);
-    std::vector<cv::Point> getDescriptors(int index);
+    std::vector<cv::Point> getDescriptors(int index, int mode);
     std::vector<double> getGaze();
     std::vector<double> getNormal();
 

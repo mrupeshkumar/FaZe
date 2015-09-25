@@ -5,14 +5,14 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/legacy/compat.hpp>
 
-void filter_image(cv::Mat roi_clr, cv::Point& pt_pupil) {
+cv::Point computePupilCDF(cv::Mat roi_clr) {
 
 	std::vector<double> cdf(256);
 	cv::Mat roi;
 	cv::cvtColor(roi_clr, roi, CV_BGR2GRAY);
 	std::cout<<"roi size : "<<roi_clr.size()<<std::endl;
 	//Preprocessing
-    GaussianBlur(roi, roi, cv::Size(3,3), 0, 0);
+	GaussianBlur(roi, roi, cv::Size(3,3), 0, 0);
 	cv::equalizeHist(roi, roi);
 
 	cv::Mat mask;
@@ -106,5 +106,5 @@ void filter_image(cv::Mat roi_clr, cv::Point& pt_pupil) {
 	pt_pupil.x = pos_i;
 	pt_pupil.y = pos_j;
 
-	cv::circle(roi_clr, cv::Point(pos_i, pos_j), 3, cv::Scalar(255,0,0), -1, 4, 0);
+	return pt_pupil;
 }

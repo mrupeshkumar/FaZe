@@ -42,10 +42,12 @@ public:
 	static const int ORIGIN_FACE_CENTRE = 1;
 
     void assign(full_object_detection shape);
+    
     cv::Point getPupil(int mode);
     std::vector<cv::Point> getDescriptors(int index);
     std::vector<double> getGaze();
     std::vector<double> getNormal();
+
     void setOrigin(cv::Point origin);
     void setOrigin(int mode);
 };

@@ -47,7 +47,7 @@ public:
 	static const int ORIGIN_IMAGE = 0;
 	static const int ORIGIN_FACE_CENTRE = 1;
 
-    void assign(full_object_detection shape);
+    void assign(full_object_detection shape, cv::Mat image, int modePupil, int modeGaze);
 
     cv::Point getPupil(int mode);
     std::vector<cv::Point> getDescriptors(int index);

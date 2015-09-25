@@ -40,7 +40,7 @@ double findSigma(int ln, int lf, double Rn, double theta) {
 	return sigma;
 }
 
-void faceModel::assign(full_object_detection shape , cv::Mat image, int mode = MODE_GAZE_VA) {
+void faceModel::assign(full_object_detection shape , cv::Mat image, int modePupil = MODE_PUPIL_SP, int modeGaze = MODE_GAZE_VA) {
 	assert(mode == MODE_GAZE_VA || mode == MODE_GAZE_QE);
 	faceShape = shape;
 	image.copyTo(inputImage);
@@ -52,7 +52,7 @@ void faceModel::assign(full_object_detection shape , cv::Mat image, int mode = M
 	computeGaze(mode);
 }
 
-void faceModel::computePupil() {
+void faceModel::computePupil(int mode) {
 	// Computing left pupil
 	std::vector<cv::Point> leftEyePoints = getFeatureDescriptors(INDEX_LEFT_EYE);
 	rectLeftEye = cv::boundingRect(leftEyePoints)

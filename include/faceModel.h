@@ -27,6 +27,9 @@ private:
 	void computeGaze(int mode);
 
 public:
+	static const int MODE_PUPIL_SP = 0;
+	static const int MODE_PUPIL_CDF = 1;
+
 	static const int MODE_GAZE_VA = 0;
 	static const int MODE_GAZE_QE = 1;
 

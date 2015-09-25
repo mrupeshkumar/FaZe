@@ -5,12 +5,9 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/legacy/compat.hpp>
 
-cv::Point computePupilCDF(cv::Mat roi_clr) {
+cv::Point computePupilCDF(cv::Mat roi) {
 
 	std::vector<double> cdf(256);
-	cv::Mat roi;
-	cv::cvtColor(roi_clr, roi, CV_BGR2GRAY);
-	std::cout<<"roi size : "<<roi_clr.size()<<std::endl;
 	//Preprocessing
 	GaussianBlur(roi, roi, cv::Size(3,3), 0, 0);
 	cv::equalizeHist(roi, roi);
@@ -76,7 +73,7 @@ cv::Point computePupilCDF(cv::Mat roi_clr) {
 
 	double avg_PI = 0;
 	int window_size;
-	window_size = roi_clr.cols*roi_clr.rows/175;
+	window_size = roi.cols*roi.rows/175;
 	std::cout<<"window_size : "<<window_size<<std::endl;
 
 	for(int i = pos_pmi_i - window_size; i < pos_pmi_i + window_size; i++) {

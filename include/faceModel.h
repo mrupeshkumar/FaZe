@@ -22,7 +22,7 @@ private:
 		1 : INDEX_RIGHT_EYE_PUPIL
 	*/
 
-	void computePupil();
+	void computePupil(int mode);
 	void computeNormal();
 	void computeGaze(int mode);
 

@@ -41,31 +41,39 @@ double findSigma(int ln, int lf, double Rn, double theta) {
 }
 
 void faceModel::assign(full_object_detection shape , cv::Mat image, int modePupil = MODE_PUPIL_SP, int modeGaze = MODE_GAZE_VA) {
-	assert(mode == MODE_GAZE_VA || mode == MODE_GAZE_QE);
+	assert(modePupil == MODE_PUPIL_SP || modePupil == MODE_PUPIL_CDF || 
+		modeGaze == MODE_GAZE_VA || modeGaze == MODE_GAZE_QE);
 	faceShape = shape;
 	image.copyTo(inputImage);
 
 	descriptors.clear();
 
-	computePupil();
+	computePupil(modePupil);
 	computeNormal();
-	computeGaze(mode);
+	computeGaze(modeGaze);
 }
 
 void faceModel::computePupil(int mode) {
-	// Computing left pupil
-	std::vector<cv::Point> leftEyePoints = getFeatureDescriptors(INDEX_LEFT_EYE);
-	rectLeftEye = cv::boundingRect(leftEyePoints)
-	roiLeftEye = inputImage(rectLeftEye)
-	preprocessROI(roiLeftEye);
-	descriptors.push_back(get_pupil_coordinates(roiLeftEye,rectLeftEye));
+	assert(mode == MODE_PUPIL_SP || mode == MODE_PUPIL_CDF);
 
-	// Computing right pupil
+	std::vector<cv::Point> leftEyePoints = getFeatureDescriptors(INDEX_LEFT_EYE);
+	rectLeftEye = cv::boundingRect(leftEyePoints);
+	roiLeftEye = inputImage(rectLeftEye);
+	preprocessROI(roiLeftEye);
+
 	std::vector<cv::Point> rightEyePoints = getFeatureDescriptors(INDEX_RIGHT_EYE);
-	rectRightEye = cv::boundingRect(rightEyePoints)
-	roiRightEye = inputImage(rectRightEye)
+	rectRightEye = cv::boundingRect(rightEyePoints);
+	roiRightEye = inputImage(rectRightEye);
 	preprocessROI(roiRightEye);
-	descriptors.push_back(get_pupil_coordinates(roiRightEye,rectRightEye));
+
+	if(mode == MODE_PUPIL_SP) {
+		descriptors.push_back(get_pupil_coordinates(roiLeftEye,rectLeftEye));
+		descriptors.push_back(get_pupil_coordinates(roiRightEye,rectRightEye));
+	}
+	else {
+		descriptors.push_back(computePupilCDF(roiLeftEye);
+		descriptors.push_back(computePupilCDF(roiRightEye);
+	}
 }
 
 void faceModel::computeNormal() {

@@ -5,6 +5,11 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/legacy/compat.hpp>
 
+#include "dlib/opencv.h"
+#include "dlib/image_processing/frontal_face_detector.h"
+#include "dlib/image_processing/render_face_detections.h"
+#include "dlib/gui_widgets.h"
+
 cv::Point computePupilCDF(cv::Mat roi) {
 
 	std::vector<double> cdf(256);
@@ -13,6 +18,7 @@ cv::Point computePupilCDF(cv::Mat roi) {
 	cv::equalizeHist(roi, roi);
 
 	cv::Mat mask;
+	cv::Point pt_pupil;
 	roi.copyTo(mask);
 	double nf, temp, pos_pmi_i, pos_pmi_j;
 

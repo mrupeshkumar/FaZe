@@ -18,20 +18,29 @@ LDFLAGS = -ljpeg -mavx -lm -lpthread -lX11 `pkg-config --libs opencv` -DDLIB_HAV
 # $^ stores the dependency
 # all: bin/oic bin/facegesmatch bin/facegescreate bin/facegeslisten
 
-# bin/oic: obj/dlib.o obj/faceDetection.o obj/pupilDetection.o obj/kalmanFilters.o obj/util.o obj/kmeansUtils.o obj/pupilCdf.o obj/gazeComputation.o obj/oic.o
-#	$(CXX) -o $@ $^ $(LDFLAGS)
-#
+bin/faze: obj/dlib.o obj/pupilDetectionCDF.o obj/pupilDetectionSP.o obj/util.o obj/gazeComputationQE.o obj/gazeComputationVA.o obj/main.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
 obj/dlib.o: src/dlib/all/source.cpp
 	mkdir -p obj bin
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-obj/pupilDetection.o: src/pupilDetection.cpp
+obj/pupilDetectionCDF.o: src/pupilDetectionCDF.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+obj/pupilDetectionSP.o: src/pupilDetectionSP.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 obj/util.o: src/util.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-obj/gazeComputation.o: src/gazeComputation.cpp
+obj/gazeComputationQE.o: src/gazeComputationQE.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+obj/gazeComputationVA.o: src/gazeComputationVA.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+obj/main.o: src/main.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 # .PHONY tells make that 'all' or 'clean' aren't _actually_ files, and always
@@ -40,5 +49,7 @@ obj/gazeComputation.o: src/gazeComputation.cpp
 
 # Delete all the temporary files we've created so far
 clean:
-	rm -rf obj/*.o
+	mv obj/dlib.o .
+	rm -rf obj/*
+	mv dlib.o obj/
 	rm -rf bin/*

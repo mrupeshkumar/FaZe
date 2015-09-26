@@ -12,9 +12,9 @@
 #include "dlib/gui_widgets.h"
 
 #include "util.h"
-#include "faceModel.h"
+#include "fazeModel.h"
 
-std::vector<double> computeGazeVA(Face face, double alpha, double magNor) {
+std::vector<double> computeGazeVA(Faze face, double alpha, double magNor) {
 	std::vector<double> vec_ep_pos_l(3), vec_ep_pos_r(3);
 	std::vector<double> vec_cp_pos_l(3), vec_cp_pos_r(3), vec_cp_pos(3);
 

@@ -11,8 +11,8 @@
 #include "dlib/image_processing/render_face_detections.h"
 #include "dlib/gui_widgets.h"
 
-#include "util.h"
 #include "fazeModel.h"
+#include "util.h"
 
 std::vector<double> computeGazeVA(Faze face, double alpha, double magNor) {
 	std::vector<double> vec_ep_pos_l(3), vec_ep_pos_r(3);

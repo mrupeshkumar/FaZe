@@ -12,11 +12,10 @@
 #include "dlib/image_processing/render_face_detections.h"
 #include "dlib/gui_widgets.h"
 
-#include "util.h"
-#include "constants.h"
-#include "faceDetection.h"
-#include "pupilDetection.h"
 #include "fazeModel.h"
+#include "util.h"
+#include "pupilDetectionCDF.h"
+#include "pupilDetectionSP.h"
 
 void preprocessROI(cv::Mat& roi_eye) {
 	GaussianBlur(roi_eye, roi_eye, cv::Size(3,3), 0, 0);
@@ -41,7 +40,7 @@ double findSigma(int ln, int lf, double Rn, double theta) {
 	return sigma;
 }
 
-void Faze::Faze() {
+Faze::Faze() {
 	Rn = 0.5;
 	Rm = 0.5;
 
@@ -57,7 +56,7 @@ void Faze::Faze() {
 	origin.y = 0;
 }
 
-void Faze::assign(full_object_detection shape , cv::Mat image, int modePupil = MODE_PUPIL_SP, int modeGaze = MODE_GAZE_VA) {
+void Faze::assign(dlib::full_object_detection shape , cv::Mat image, int modePupil = MODE_PUPIL_SP, int modeGaze = MODE_GAZE_VA) {
 	assert(modePupil == MODE_PUPIL_SP || modePupil == MODE_PUPIL_CDF || 
 		modeGaze == MODE_GAZE_VA || modeGaze == MODE_GAZE_QE);
 	faceShape = shape;
@@ -98,14 +97,14 @@ dlib::full_object_detection Faze::getShape() {
 }
 
 	void Faze::computeNormal() {
-		cv::Point midEye = get_mid_point(cv::Point(shape.part(39).x(), shape.part(39).y()),
-			cv::Point(shape.part(40).x(), shape.part(40).y()));
+		cv::Point midEye = get_mid_point(cv::Point(faceShape.part(39).x(), faceShape.part(39).y()),
+			cv::Point(faceShape.part(40).x(), faceShape.part(40).y()));
 
-		cv::Point mouth = get_mid_point(cv::Point(shape.part(48).x(), shape.part(48).y()),
-			cv::Point(shape.part(54).x(), shape.part(54).y()));
+		cv::Point mouth = get_mid_point(cv::Point(faceShape.part(48).x(), faceShape.part(48).y()),
+			cv::Point(faceShape.part(54).x(), faceShape.part(54).y()));
 
-		cv::Point noseTip = cv::Point(shape.part(30).x(), shape.part(30).y());
-		cv::Point noseBase = cv::Point(shape.part(33).x(), shape.part(33).y());
+		cv::Point noseTip = cv::Point(faceShape.part(30).x(), faceShape.part(30).y());
+		cv::Point noseBase = cv::Point(faceShape.part(33).x(), faceShape.part(33).y());
 
 	// symm angle - angle between the symmetry axis and the 'x' axis 
 		symm_x = get_angle_between(noseBase, midEye);
@@ -134,9 +133,9 @@ dlib::full_object_detection Faze::getShape() {
 
 	void computeGaze(int mode) {
 		assert(mode == MODE_GAZE_VA || mode == MODE_GAZE_QE);
-		if(mode == MODE_GAZE_GE) {
+		if(mode == MODE_GAZE_QE) {
 		// TODO : fill this
-			computeGazeGE();
+			//computeGazeGE();
 		}
 		else {
 			computeGazeVA(this, ALPHA, MAG_NORMAL);
@@ -155,8 +154,8 @@ dlib::full_object_detection Faze::getShape() {
 			origin.y = 0;
 		}
 		else if (mode == ORIGIN_FACE_CENTRE) {
-			origin.x = shape.part(30).x();
-			origin.y = shape.part(30).y();
+			origin.x = faceShape.part(30).x();
+			origin.y = faceShape.part(30).y();
 		}
 	}
 
@@ -191,21 +190,21 @@ dlib::full_object_detection Faze::getShape() {
 			}
 			return rightEyePoints;
 		}
-		else if (index == INDEX_LEFT_EYE_BROW) {
+		else if (index == INDEX_LEFT_EYEBROW) {
 			std::vector<cv::Point> leftEyeBrowPoints;
 			for (int i=17; i<=21; i++){
 				leftEyeBrowPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
 			}
 			return leftEyeBrowPoints;
 		}
-		else if (index == INDEX_RIGHT_EYE_BROW || ) {
+		else if (index == INDEX_RIGHT_EYEBROW) {
 			std::vector<cv::Point> rightEyeBrowPoints;
 			for (int i=22; i<=26; i++){
 				rightEyeBrowPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
 			}
 			return rightEyeBrowPoints;
 		}
-		else if (index == INDEX_NOSE_UPPER || )  {
+		else if (index == INDEX_NOSE_UPPER)  {
 			std::vector<cv::Point> noseUpperPoints;
 			for (int i=27; i<=30; i++){
 				noseUpperPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
@@ -225,7 +224,7 @@ dlib::full_object_detection Faze::getShape() {
 				mouthOuterPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
 			}
 			return mouthOuterPoints;
-		}
+		}	
 		else if (index == INDEX_MOUTH_INNER) {
 			std::vector<cv::Point> mouthInnerPoints;
 			for (int i=60; i<=67; i++){

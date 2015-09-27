@@ -56,10 +56,10 @@ public:
 	double MAG_CR, MAG_LR, MAG_CP, MAG_CM;
 	double ALPHA, THETA;
 
-    void assign(dlib::full_object_detection shape, cv::Mat image, int modePupil, int modeGaze);
+    void assign(dlib::full_object_detection shape, cv::Mat image, int modePupil = MODE_PUPIL_SP, int modeGaze = MODE_GAZE_VA);
 
     cv::Point getPupil(int mode);
-    std::vector<cv::Point> getDescriptors(int index, int mode);
+    std::vector<cv::Point> getDescriptors(int index, int mode = DESCRIPTOR_GLOBAL);
     std::vector<double> getGaze();
     std::vector<double> getNormal();
     dlib::full_object_detection getShape();

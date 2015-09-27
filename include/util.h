@@ -16,5 +16,6 @@ cv::Mat get_rotation_matrix_z(double theta);
 void get_rotated_vector(std::vector<double> vec, std::vector<double>& vec_rot);
 void get_reverse_vector(std::vector<double> vec, std::vector<double>& vec_rot);
 void cross_product(std::vector<double> vec1, std::vector<double> vec2, std::vector<double>& product);
+double get_conversion_factor (dlib::full_object_detection shape, Faze face, double magnitude_normal, int mode);
 
 #endif

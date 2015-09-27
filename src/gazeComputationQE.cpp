@@ -11,8 +11,8 @@
 #include "dlib/image_processing/render_face_detections.h"
 #include "dlib/gui_widgets.h"
 
-#include "util.h"
 #include "fazeModel.h"
+#include "util.h"
 
 void compute_vec_LR (cv::Point p1, cv::Point p2, Faze face, std::vector<double>& LR) {
 	double scale = 20.784/30.0;
@@ -82,8 +82,8 @@ void get_section(cv::Point p1, cv::Point p2, cv::Point pupil, double& Y1, double
 //		 face.MAG_LR square changed to just face.MAG_LR.
 
 void compute_vec_CP(cv::Point p1, cv::Point p2, cv::Point pupil, cv::Rect rect, Faze face, 
-	std::vector<double> vec_CR_u, double face.MAG_CR, std::vector<double> vec_LR_u, double face.MAG_LR, 
-	std::vector<double> vec_UD_u, double face.MAG_CP, std::vector<double>& vec_CP, double S2R, int mode) {
+	std::vector<double> vec_CR_u, double MAG_CR, std::vector<double> vec_LR_u, double MAG_LR, 
+	std::vector<double> vec_UD_u, double MAG_CP, std::vector<double>& vec_CP, double S2R, int mode) {
 	double Y1, Y2, H;
 	get_section(p1, p2, cv::Point(pupil.x + rect.x, pupil.y + rect.y), Y1, Y2, H);
 
@@ -165,8 +165,12 @@ void computeGaze_ (Faze face, int mode, std::vector<double>& vec_CP) {
 
 	//log_vec("CR", vec_CR_u);
 
+	cv::Point pupil = face.getPupil(face.INDEX_LEFT_EYE_PUPIL);
+
 	compute_vec_CP(p1, p2, pupil, rect, face, vec_CR_u, face.MAG_CR, vec_LR_u, face.MAG_LR,
 		vec_UD_u, face.MAG_CP, vec_CP_l, S2R, 2);
+
+	pupil = face.getPupil(face.INDEX_RIGHT_EYE_PUPIL);
 
 	compute_vec_CP(p1, p2, pupil, rect, face, vec_CR_u, face.MAG_CR, vec_LR_u, face.MAG_LR,
 		vec_UD_u, face.MAG_CP, vec_CP_r, S2R, 1);

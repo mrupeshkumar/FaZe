@@ -1,4 +1,3 @@
-
 #include <math.h>
 #include <stdlib.h>
 #include <string>
@@ -16,6 +15,8 @@
 #include "util.h"
 #include "pupilDetectionCDF.h"
 #include "pupilDetectionSP.h"
+
+#define PI 3.14
 
 void preprocessROI(cv::Mat& roi_eye) {
 	GaussianBlur(roi_eye, roi_eye, cv::Size(3,3), 0, 0);
@@ -56,13 +57,16 @@ Faze::Faze() {
 	origin.y = 0;
 }
 
-void Faze::assign(dlib::full_object_detection shape , cv::Mat image, int modePupil = MODE_PUPIL_SP, int modeGaze = MODE_GAZE_VA) {
+void Faze::assign(dlib::full_object_detection shape , cv::Mat image, int modePupil, int modeGaze) {
 	assert(modePupil == MODE_PUPIL_SP || modePupil == MODE_PUPIL_CDF || 
 		modeGaze == MODE_GAZE_VA || modeGaze == MODE_GAZE_QE);
 	faceShape = shape;
-	image.copyTo(inputImage);
+	image.copyTo(imageColor);
+	cv::cvtColor(imageColor, imageGray, CV_BGR2GRAY);
 
 	descriptors.clear();
+	normal.clear();
+	normal.resize(3);
 
 	computePupil(modePupil);
 	computeNormal();
@@ -73,13 +77,13 @@ void Faze::computePupil(int mode) {
 	assert(mode == MODE_PUPIL_SP || mode == MODE_PUPIL_CDF);
 
 	std::vector<cv::Point> leftEyePoints = getDescriptors(INDEX_LEFT_EYE);
-	rectLeftEye = cv::boundingRect(leftEyePoints);
-	roiLeftEye = inputImage(rectLeftEye);
+	cv::Rect rectLeftEye = cv::boundingRect(leftEyePoints);
+	cv::Mat roiLeftEye = imageGray(rectLeftEye);
 	preprocessROI(roiLeftEye);
 
 	std::vector<cv::Point> rightEyePoints = getDescriptors(INDEX_RIGHT_EYE);
-	rectRightEye = cv::boundingRect(rightEyePoints);
-	roiRightEye = inputImage(rectRightEye);
+	cv::Rect rectRightEye = cv::boundingRect(rightEyePoints);
+	cv::Mat roiRightEye = imageGray(rectRightEye);
 	preprocessROI(roiRightEye);
 
 	if(mode == MODE_PUPIL_SP) {
@@ -87,8 +91,8 @@ void Faze::computePupil(int mode) {
 		descriptors.push_back(get_pupil_coordinates(roiRightEye,rectRightEye));
 	}
 	else {
-		descriptors.push_back(computePupilCDF(roiLeftEye);
-			descriptors.push_back(computePupilCDF(roiRightEye);
+		descriptors.push_back(computePupilCDF(roiLeftEye));
+			descriptors.push_back(computePupilCDF(roiRightEye));
 		}
 	}
 
@@ -131,19 +135,19 @@ dlib::full_object_detection Faze::getShape() {
 		}
 	}
 
-	void computeGaze(int mode) {
+	void Faze::computeGaze(int mode) {
 		assert(mode == MODE_GAZE_VA || mode == MODE_GAZE_QE);
 		if(mode == MODE_GAZE_QE) {
 		// TODO : fill this
 			//computeGazeGE();
 		}
 		else {
-			computeGazeVA(this, ALPHA, MAG_NORMAL);
+			//computeGazeVA(this, ALPHA, MAG_NOR);
 		}
 	}
 
 	void Faze::setOrigin(cv::Point origin) {
-		this.origin = origin;
+		this->origin = origin;
 	}
 
 	void Faze::setOrigin(int mode) {
@@ -159,7 +163,7 @@ dlib::full_object_detection Faze::getShape() {
 		}
 	}
 
-	std::vector<double> getNormal() {
+	std::vector<double> Faze::getNormal() {
 		return normal;
 	}
 
@@ -168,7 +172,7 @@ dlib::full_object_detection Faze::getShape() {
 		return descriptors[mode - INDEX_LEFT_EYE_PUPIL];
 	}
 
-	std::vector<double> getGaze() {
+	std::vector<double> Faze::getGaze() {
 		return gaze;
 	}
 
@@ -234,13 +238,14 @@ dlib::full_object_detection Faze::getShape() {
 		}
 	}
 
-	void relativeToOrigin(std::vector<cv::Point>& vec) {
-		vec[0] -= origin.x;
-		vec[1] -= origin.y;
-		vec[2] -= 0.0;
+	void Faze::relativeToOrigin(std::vector<cv::Point>& vec) {
+		for(int i=0; i<(int)vec.size(); ++i) {
+			vec[i].x -= origin.x;
+			vec[i].y -= origin.y;
+		}
 	}
 
-	std::vector<cv::Point> Faze::getDescriptors(int index, int mode = DESCRIPTOR_GLOBAL) {
+	std::vector<cv::Point> Faze::getDescriptors(int index, int mode) {
 		assert(mode == DESCRIPTOR_GLOBAL || mode == DESCRIPTOR_LOCAL);
 		std::vector<cv::Point> vec = getIntermediateDescriptors(index);
 		if(mode == DESCRIPTOR_LOCAL)

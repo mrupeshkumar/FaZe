@@ -36,9 +36,15 @@ int main(int argc, char** argv) {
 
 		std::vector<rectangle> faces = detector(cimg_gray);
 
-		full_object_detection shape = pose_model(cimg_gray, faces[0]);
-
-		faze.assign(shape, frame_clr);
+		if((int)faces.size() != 0) {
+			full_object_detection shape = pose_model(cimg_gray, faces[0]);
+			faze.assign(shape, frame_clr);
+			std::vector<double> normal = faze.getNormal();
+			cout<<normal[0]<<" "<<normal[1]<<" "<<normal[2]<<endl;
+		}
+		else {
+			cout<<"No faces"<<endl;
+		}
 	}
 	return 0;
 }

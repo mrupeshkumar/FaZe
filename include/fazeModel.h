@@ -7,6 +7,7 @@ private:
 
 	dlib::full_object_detection faceShape;
 	cv::Point origin;
+	cv::Mat imageColor, imageGray;
 
 	double yaw, pitch, sigma, symm_x, theta, tau;
 	std::vector<double> normal, gaze;
@@ -21,11 +22,12 @@ private:
 	void computeNormal();
 	void computeGaze(int mode);
     std::vector<cv::Point> getIntermediateDescriptors(int index);
+    void relativeToOrigin(std::vector<cv::Point>& vec);
 
 public:
 	static const int MODE_LEFT = 0;
 	static const int MODE_RIGHT = 0;
-	
+
 	static const int MODE_PUPIL_SP = 0;
 	static const int MODE_PUPIL_CDF = 1;
 
@@ -55,6 +57,8 @@ public:
 	double MAG_NOR;
 	double MAG_CR, MAG_LR, MAG_CP, MAG_CM;
 	double ALPHA, THETA;
+
+	Faze();
 
     void assign(dlib::full_object_detection shape, cv::Mat image, int modePupil = MODE_PUPIL_SP, int modeGaze = MODE_GAZE_VA);
 

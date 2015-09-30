@@ -74,9 +74,38 @@ int main(int argc, char** argv) {
 			log(mouthCtrsOut);
 			log(mouthCtrsIn);
 
+            cv::Mat faceROIRaw = frameResized(cvFaceRectResized), faceROITrans, rotMat;
+            //faceROIRaw.convertTo(faceROIRaw, CV_64F);
+            double cosT = normal[2], sinT = sqrt(1 - normal[2]*normal[2]);
+            double p1X, p1Y, p2X, p2Y;
+            p1X = 00.0*sinT;
+            p1Y = 300.0/cosT;
+            p2X = 300.0;//*cosT + 300.0*sinT;
+            p2Y = -00.0*sinT + 300.0/cosT;
+
+            std::vector<cv::Point2f> ptsIn, ptsOut;
+
+            ptsIn.push_back(cv::Point2f(0, 0));
+            ptsIn.push_back(cv::Point2f(300, 0));
+            ptsIn.push_back(cv::Point2f(0, 300));
+            ptsIn.push_back(cv::Point2f(300, 300));
+
+            ptsOut.push_back(cv::Point2f(0, 0));
+            ptsOut.push_back(cv::Point2f(300, 0));
+            ptsOut.push_back(cv::Point2f(p1X, p1Y));
+            ptsOut.push_back(cv::Point2f(p2X, p2Y));
+
+            rotMat = cv::getPerspectiveTransform(ptsIn, ptsOut);
+
+            //cv::Rodrigues(normal, rotMat);
+            cv::warpPerspective(faceROIRaw, faceROITrans, rotMat, cv::Size(600, 600));
+            cv::imwrite("test.jpg", faceROIRaw);
+            faceROITrans.convertTo(faceROITrans, CV_8UC1);
+            cv_image<unsigned char> cimg_gray_face(faceROITrans);
+
 			win.clear_overlay();
-			win.set_image(cimg_gray_resized);
-			win.add_overlay(render_face_detections(shape));
+    		win.set_image(cimg_gray_face);
+            //win.add_overlay(render_face_detections(shape));
 		}
 		else {
 			cout<<"No faces"<<endl;

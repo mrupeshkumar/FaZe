@@ -16,7 +16,9 @@
 #include "pupilDetectionCDF.h"
 #include "pupilDetectionSP.h"
 
+#ifndef PI
 #define PI 3.14
+#endif
 
 void preprocessROI(cv::Mat& roi_eye) {
 	GaussianBlur(roi_eye, roi_eye, cv::Size(3,3), 0, 0);

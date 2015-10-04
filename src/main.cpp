@@ -89,14 +89,14 @@ int main(int argc, char** argv) {
 			faze.setOrigin(faze.ORIGIN_FACE_CENTRE);
 
 			std::vector<double> normal = faze.getNormal();
-			cout<<normal[0]<<" "<<normal[1]<<" "<<normal[2]<<endl;
+			cout<<normal[0]<<","<<normal[1]<<","<<normal[2]<<endl;
 			
 			std::vector<cv::Point> mouthCtrsOut = faze.getDescriptors(faze.INDEX_MOUTH_OUTER, faze.DESCRIPTOR_LOCAL);
 			std::vector<cv::Point> mouthCtrsIn = faze.getDescriptors(faze.INDEX_MOUTH_INNER, faze.DESCRIPTOR_LOCAL);
 
 			//log(mouthCtrsOut);
 			//log(mouthCtrsIn);
-
+/*
 			cv::Mat faceROIRaw = frameResized(cvFaceRectResized), faceROITrans;
             double n1 = normal[0], n2 = normal[1], n3 = normal[2];
             cv::Mat_<double> Rx(3, 3), Ry(3, 3), Rz(3, 3), rotMat(3, 3);
@@ -118,12 +118,12 @@ int main(int argc, char** argv) {
             Rz(0, 1) = -Rz(1, 0);
             Rz(1, 1) = Rz(0, 0);
 
-            rotMat = Rz*Ry*Rx;
-            logMat(rotMat);
+            rotMat = Rz*Ry*Rx;*/
+            //logMat(rotMat);
 
-            faceROIRaw.convertTo(faceROIRaw, CV_64F);
+            //faceROIRaw.convertTo(faceROIRaw, CV_64F);
             //cv::Mat temp;
-            process(faceROIRaw, faze.getShape());
+            //process(faceROIRaw, faze.getShape());
             //faceROIRaw.copyTo(temp);
             //temp.convertTo(temp, CV_8UC1);
             //win2.set_image(cv_image<unsigned char>(temp));
@@ -180,7 +180,7 @@ int main(int argc, char** argv) {
             }*/
 
             //cv::Rodrigues(normal, rotMat);
-           cv::warpPerspective(faceROIRaw, faceROITrans, rotMat, cv::Size(300, 300));
+           //cv::warpPerspective(faceROIRaw, faceROITrans, rotMat, cv::Size(300, 300));
             /*
             faceROITrans.convertTo(faceROITrans, CV_8UC1);
             cout<<shape.part(0).x()-faceResized.left()<<" "<<shape.part(0).y()-faceResized.top()<<endl;
@@ -193,17 +193,17 @@ int main(int argc, char** argv) {
             faceROIRaw.at<uchar>(shape.part(16).x()-faceResized.left(), shape.part(16).y()-faceResized.top()) = 255;
             faceROIRaw.at<uchar>(shape.part(8).x()-faceResized.left(), shape.part(8).y()-faceResized.top()) = 255;
             */
-            cv_image<double> cimg_gray_face(faceROITrans);
+           /* cv_image<double> cimg_gray_face(faceROITrans);
             cv_image<double> cimg_gray_face_raw(faceROIRaw);
-            cv::resize(rotMat, rotMat, cv::Size(300, 300));
-
+            cv::resize(rotMat, rotMat, cv::Size(300, 300));*/
+/*
             win.clear_overlay();
             win.set_image(cimg_gray_face);
             //win.add_overlay(render_face_detections(shape));
-            win1.set_image(cv_image<double>(rotMat));
+            win1.set_image(cv_image<double>(rotMat));*/
         }
         else {
-        	cout<<"No faces"<<endl;
+        	//cout<<"No faces"<<endl;
         }
     }
     return 0;

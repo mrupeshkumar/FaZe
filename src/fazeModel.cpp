@@ -94,163 +94,163 @@ void Faze::computePupil(int mode) {
 	}
 	else {
 		descriptors.push_back(computePupilCDF(roiLeftEye));
-			descriptors.push_back(computePupilCDF(roiRightEye));
-		}
+		descriptors.push_back(computePupilCDF(roiRightEye));
 	}
+}
 
 dlib::full_object_detection Faze::getShape() {
 	return faceShape;
 }
 
-	void Faze::computeNormal() {
-		cv::Point midEye = get_mid_point(cv::Point(faceShape.part(39).x(), faceShape.part(39).y()),
-			cv::Point(faceShape.part(40).x(), faceShape.part(40).y()));
+void Faze::computeNormal() {
+	cv::Point midEye = get_mid_point(cv::Point(faceShape.part(39).x(), faceShape.part(39).y()),
+		cv::Point(faceShape.part(40).x(), faceShape.part(40).y()));
 
-		cv::Point mouth = get_mid_point(cv::Point(faceShape.part(48).x(), faceShape.part(48).y()),
-			cv::Point(faceShape.part(54).x(), faceShape.part(54).y()));
+	cv::Point mouth = get_mid_point(cv::Point(faceShape.part(48).x(), faceShape.part(48).y()),
+		cv::Point(faceShape.part(54).x(), faceShape.part(54).y()));
 
-		cv::Point noseTip = cv::Point(faceShape.part(30).x(), faceShape.part(30).y());
-		cv::Point noseBase = cv::Point(faceShape.part(33).x(), faceShape.part(33).y());
+	cv::Point noseTip = cv::Point(faceShape.part(30).x(), faceShape.part(30).y());
+	cv::Point noseBase = cv::Point(faceShape.part(33).x(), faceShape.part(33).y());
 
 	// symm angle - angle between the symmetry axis and the 'x' axis 
-		symm_x = get_angle_between(noseBase, midEye);
+	symm_x = get_angle_between(noseBase, midEye);
 	// tilt angle - angle between normal in image and 'x' axis
-		tau = get_angle_between(noseBase, noseTip);
+	tau = get_angle_between(noseBase, noseTip);
 	// theta angle - angle between the symmetry axis and the image normal
-		theta = (abs(tau - symm_x)) * (PI/180.0);
+	theta = (abs(tau - symm_x)) * (PI/180.0);
 
 	// sigma - slant angle
-		sigma = findSigma(get_distance(noseTip, noseBase), get_distance(midEye, mouth), Rn, theta);
+	sigma = findSigma(get_distance(noseTip, noseBase), get_distance(midEye, mouth), Rn, theta);
 
-		normal[0] = (sin(sigma))*(cos((360 - tau)*(PI/180.0)));
-		normal[1] = (sin(sigma))*(sin((360 - tau)*(PI/180.0)));
-		normal[2] = -cos(sigma);
+	normal[0] = (sin(sigma))*(cos((360 - tau)*(PI/180.0)));
+	normal[1] = (sin(sigma))*(sin((360 - tau)*(PI/180.0)));
+	normal[2] = -cos(sigma);
 
-		pitch = acos(sqrt((normal[0]*normal[0] + normal[2]*normal[2])/(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2])));
-		if((noseTip.y - noseBase.y) < 0) {
-			pitch = -pitch;
-		}
-
-		yaw = acos((abs(normal[2]))/(sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2])));
-		if((noseTip.x - noseBase.x) < 0) {
-			yaw = -yaw;
-		}
+	pitch = acos(sqrt((normal[0]*normal[0] + normal[2]*normal[2])/(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2])));
+	if((noseTip.y - noseBase.y) < 0) {
+		pitch = -pitch;
 	}
 
-	void Faze::computeGaze(int mode) {
-		assert(mode == MODE_GAZE_VA || mode == MODE_GAZE_QE);
-		if(mode == MODE_GAZE_QE) {
+	yaw = acos((abs(normal[2]))/(sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2])));
+	if((noseTip.x - noseBase.x) < 0) {
+		yaw = -yaw;
+	}
+}
+
+void Faze::computeGaze(int mode) {
+	assert(mode == MODE_GAZE_VA || mode == MODE_GAZE_QE);
+	if(mode == MODE_GAZE_QE) {
 		// TODO : fill this
 			//computeGazeGE();
-		}
-		else {
+	}
+	else {
 			//computeGazeVA(this, ALPHA, MAG_NOR);
-		}
 	}
+}
 
-	void Faze::setOrigin(cv::Point origin) {
-		this->origin = origin;
+void Faze::setOrigin(cv::Point origin) {
+	this->origin = origin;
+}
+
+void Faze::setOrigin(int mode) {
+	assert(mode == ORIGIN_IMAGE || mode == ORIGIN_FACE_CENTRE);
+
+	if (mode == ORIGIN_IMAGE) {
+		origin.x = 0;
+		origin.y = 0;
 	}
-
-	void Faze::setOrigin(int mode) {
-		assert(mode == ORIGIN_IMAGE || mode == ORIGIN_FACE_CENTRE);
-
-		if (mode == ORIGIN_IMAGE) {
-			origin.x = 0;
-			origin.y = 0;
-		}
-		else if (mode == ORIGIN_FACE_CENTRE) {
-			origin.x = faceShape.part(30).x();
-			origin.y = faceShape.part(30).y();
-		}
+	else if (mode == ORIGIN_FACE_CENTRE) {
+		origin.x = faceShape.part(30).x();
+		origin.y = faceShape.part(30).y();
 	}
+}
 
-	std::vector<double> Faze::getNormal() {
-		return normal;
+std::vector<double> Faze::getNormal() {
+	return normal;
+}
+
+cv::Point Faze::getPupil(int mode) {
+	assert(mode == INDEX_LEFT_EYE_PUPIL || mode == INDEX_RIGHT_EYE_PUPIL);
+	return descriptors[mode - INDEX_LEFT_EYE_PUPIL];
+}
+
+std::vector<double> Faze::getGaze() {
+	return gaze;
+}
+
+std::vector<cv::Point> Faze::getIntermediateDescriptors(int index) {
+	assert(index == INDEX_LEFT_EYE || index == INDEX_RIGHT_EYE || index == INDEX_LEFT_EYE_BROW || index == INDEX_RIGHT_EYE_BROW 
+		|| index == INDEX_NOSE_UPPER || index == INDEX_NOSE_LOWER || index == INDEX_MOUTH_OUTER || index == INDEX_MOUTH_INNER); 
+
+	if (index == INDEX_LEFT_EYE) {
+		std::vector<cv::Point> leftEyePoints;
+		for (int i=36; i<=41; i++){
+			leftEyePoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
+		}
+		return leftEyePoints;
 	}
-
-	cv::Point Faze::getPupil(int mode) {
-		assert(mode == INDEX_LEFT_EYE_PUPIL || mode == INDEX_RIGHT_EYE_PUPIL);
-		return descriptors[mode - INDEX_LEFT_EYE_PUPIL];
+	else if (index == INDEX_RIGHT_EYE) {
+		std::vector<cv::Point> rightEyePoints;
+		for (int i=42; i<=47; i++){
+			rightEyePoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
+		}
+		return rightEyePoints;
 	}
-
-	std::vector<double> Faze::getGaze() {
-		return gaze;
+	else if (index == INDEX_LEFT_EYEBROW) {
+		std::vector<cv::Point> leftEyeBrowPoints;
+		for (int i=17; i<=21; i++){
+			leftEyeBrowPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
+		}
+		return leftEyeBrowPoints;
 	}
-
-	std::vector<cv::Point> Faze::getIntermediateDescriptors(int index) {
-		assert(index == INDEX_LEFT_EYE || index == INDEX_RIGHT_EYE || index == INDEX_LEFT_EYE_BROW || index == INDEX_RIGHT_EYE_BROW 
-			|| index == INDEX_NOSE_UPPER || index == INDEX_NOSE_LOWER || index == INDEX_MOUTH_OUTER || index == INDEX_MOUTH_INNER); 
-
-		if (index == INDEX_LEFT_EYE) {
-			std::vector<cv::Point> leftEyePoints;
-			for (int i=36; i<=41; i++){
-				leftEyePoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
-			}
-			return leftEyePoints;
+	else if (index == INDEX_RIGHT_EYEBROW) {
+		std::vector<cv::Point> rightEyeBrowPoints;
+		for (int i=22; i<=26; i++){
+			rightEyeBrowPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
 		}
-		else if (index == INDEX_RIGHT_EYE) {
-			std::vector<cv::Point> rightEyePoints;
-			for (int i=42; i<=47; i++){
-				rightEyePoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
-			}
-			return rightEyePoints;
-		}
-		else if (index == INDEX_LEFT_EYEBROW) {
-			std::vector<cv::Point> leftEyeBrowPoints;
-			for (int i=17; i<=21; i++){
-				leftEyeBrowPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
-			}
-			return leftEyeBrowPoints;
-		}
-		else if (index == INDEX_RIGHT_EYEBROW) {
-			std::vector<cv::Point> rightEyeBrowPoints;
-			for (int i=22; i<=26; i++){
-				rightEyeBrowPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
-			}
-			return rightEyeBrowPoints;
-		}
-		else if (index == INDEX_NOSE_UPPER)  {
-			std::vector<cv::Point> noseUpperPoints;
-			for (int i=27; i<=30; i++){
-				noseUpperPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
-			}
-			return noseUpperPoints;
-		}
-		else if (index == INDEX_NOSE_LOWER) {
-			std::vector<cv::Point> noseLowerPoints;
-			for (int i=31; i<=35; i++){
-				noseLowerPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
-			}
-			return noseLowerPoints;
-		}
-		else if (index == INDEX_MOUTH_OUTER) {
-			std::vector<cv::Point> mouthOuterPoints;
-			for (int i=48; i<59; i++){
-				mouthOuterPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
-			}
-			return mouthOuterPoints;
-		}	
-		else if (index == INDEX_MOUTH_INNER) {
-			std::vector<cv::Point> mouthInnerPoints;
-			for (int i=60; i<=67; i++){
-				mouthInnerPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
-			}
-			return mouthInnerPoints;
-		}
+		return rightEyeBrowPoints;
 	}
-
-	void Faze::relativeToOrigin(std::vector<cv::Point>& vec) {
-		for(int i=0; i<(int)vec.size(); ++i) {
-			vec[i].x -= origin.x;
-			vec[i].y -= origin.y;
+	else if (index == INDEX_NOSE_UPPER)  {
+		std::vector<cv::Point> noseUpperPoints;
+		for (int i=27; i<=30; i++){
+			noseUpperPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
 		}
+		return noseUpperPoints;
 	}
+	else if (index == INDEX_NOSE_LOWER) {
+		std::vector<cv::Point> noseLowerPoints;
+		for (int i=31; i<=35; i++){
+			noseLowerPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
+		}
+		return noseLowerPoints;
+	}
+	else if (index == INDEX_MOUTH_OUTER) {
+		std::vector<cv::Point> mouthOuterPoints;
+		for (int i=48; i<59; i++){
+			mouthOuterPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
+		}
+		return mouthOuterPoints;
+	}	
+	else if (index == INDEX_MOUTH_INNER) {
+		std::vector<cv::Point> mouthInnerPoints;
+		for (int i=60; i<=67; i++){
+			mouthInnerPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
+		}
+		return mouthInnerPoints;
+	}
+}
 
-	std::vector<cv::Point> Faze::getDescriptors(int index, int mode) {
-		assert(mode == DESCRIPTOR_GLOBAL || mode == DESCRIPTOR_LOCAL);
-		std::vector<cv::Point> vec = getIntermediateDescriptors(index);
-		if(mode == DESCRIPTOR_LOCAL)
-			relativeToOrigin(vec);
-		return vec;
+void Faze::relativeToOrigin(std::vector<cv::Point>& vec) {
+	for(int i=0; i<(int)vec.size(); ++i) {
+		vec[i].x -= origin.x;
+		vec[i].y -= origin.y;
 	}
+}
+
+std::vector<cv::Point> Faze::getDescriptors(int index, int mode) {
+	assert(mode == DESCRIPTOR_GLOBAL || mode == DESCRIPTOR_LOCAL);
+	std::vector<cv::Point> vec = getIntermediateDescriptors(index);
+	if(mode == DESCRIPTOR_LOCAL)
+		relativeToOrigin(vec);
+	return vec;
+}

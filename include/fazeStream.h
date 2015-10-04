@@ -26,6 +26,7 @@ private:
 	int _degree;
 	int _smooth;
 	FixedBin<Faze> _fazes;
+	Faze _faze;
 	cv::KalmanFilter _kalmanFilter;
 	cv::Mat _measurements;
 
@@ -38,4 +39,5 @@ public:
 	int smooth();
 	int filled();
 	void push(Faze faze);
+	Faze current();
 };

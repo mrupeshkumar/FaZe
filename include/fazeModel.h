@@ -24,6 +24,8 @@ private:
     std::vector<cv::Point> getIntermediateDescriptors(int index);
     void relativeToOrigin(std::vector<cv::Point>& vec);
 
+    friend class Stream;
+
 public:
 	static const int MODE_LEFT = 0;
 	static const int MODE_RIGHT = 0;

@@ -11,7 +11,9 @@
 #include "dlib/image_processing/render_face_detections.h"
 #include "dlib/gui_widgets.h"
 
+#include "fixedBin.h"
 #include "fazeModel.h"
+#include "fazeStream.h"
 
 // Force resize to 300, 300 as dlib faces are nearly square
 
@@ -49,6 +51,7 @@ void process(cv::Mat& mat, full_object_detection shape) {
 
 int main(int argc, char** argv) {
 	Faze faze = Faze();
+    Stream stream(2, Stream(2).SMOOTH_KALMAN);
 	cv::VideoCapture cap(0);
 	cv::Mat frame_clr, frame;
 	image_window win, win1, win2;
@@ -88,7 +91,9 @@ int main(int argc, char** argv) {
 			faze.assign(shape, frame_clr);
 			faze.setOrigin(faze.ORIGIN_FACE_CENTRE);
 
-			std::vector<double> normal = faze.getNormal();
+            stream.push(faze);
+
+			std::vector<double> normal = stream.current().getNormal();
 			cout<<normal[0]<<","<<normal[1]<<","<<normal[2]<<endl;
 			
 			std::vector<cv::Point> mouthCtrsOut = faze.getDescriptors(faze.INDEX_MOUTH_OUTER, faze.DESCRIPTOR_LOCAL);

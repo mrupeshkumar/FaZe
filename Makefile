@@ -18,7 +18,7 @@ LDFLAGS = -ljpeg -mavx -lm -lpthread -lX11 `pkg-config --libs opencv` -DDLIB_HAV
 # $^ stores the dependency
 # all: bin/oic bin/facegesmatch bin/facegescreate bin/facegeslisten
 
-bin/faze: obj/dlib.o obj/fazeModel.o obj/pupilDetectionCDF.o obj/pupilDetectionSP.o obj/util.o obj/main.o
+bin/faze: obj/dlib.o obj/fazeModel.o obj/fixedBin.o obj/fazeStream.o obj/pupilDetectionCDF.o obj/pupilDetectionSP.o obj/util.o obj/main.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 obj/dlib.o: src/dlib/all/source.cpp
@@ -35,6 +35,12 @@ obj/pupilDetectionSP.o: src/pupilDetectionSP.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 obj/util.o: src/util.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+obj/fazeStream.o: src/fazeStream.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+obj/fixedBin.o: src/fixedBin.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 #obj/gazeComputationQE.o: src/gazeComputationQE.cpp

@@ -11,7 +11,9 @@
 #include "dlib/image_processing/render_face_detections.h"
 #include "dlib/gui_widgets.h"
 
+#include "fixedBin.h"
 #include "fazeModel.h"
+#include "fazeStream.h"
 #include "util.h"
 #include "pupilDetectionCDF.h"
 #include "pupilDetectionSP.h"
@@ -20,16 +22,23 @@
 #define PI 3.14
 #endif
 
+template class FixedBin<Faze>;
+
+int fact(int n) {
+	assert(n>=0);
+	if(n==0) return 1;
+	else return n*fact(n-1);
+}
+
 Stream::Stream(int degree, int smooth) {
 	assert(smooth == SMOOTH_AVG || smooth == SMOOTH_KALMAN);
 	assert(degree > 0);
 
 	_smooth = smooth;
-	_bin = FixedBin();
+	_bin = FixedBin<Faze>();
 	_bin.assign(degree);
 
-
-	_kalmanFilter((_degree+1)*3, (_degree+1)*3)
+	_kalmanFilter = cv::KalmanFilter((_degree+1)*3, (_degree+1)*3, 0);
 	_measurements((_degree+1)*3, 1);
 	_measurementsOld((_degree+1)*3, 1);
 }
@@ -37,11 +46,10 @@ Stream::Stream(int degree, int smooth) {
 void Stream::push(Faze faze) {
 	_bin.push(faze);
 	int s = (_degree+1)*3;
+	std::vector<double> vec = faze.getNormal();
 
 	if(_smooth == SMOOTH_KALMAN) {
-
-		if(_bin.filled == 1) {
-			std::vector<double> vec = faze.getNormal();
+		if(_bin.filled() == 1) {
 			_faze.normal = vec;
 			for(int i=0; i<s;i+=3) {
 				if(i==0) {
@@ -56,15 +64,15 @@ void Stream::push(Faze faze) {
 				}
 			}
 
-			cv::Mat_<float>(s, s) pNC;
+			cv::Mat_<float> pNC(s, s);
 			for(int i=0; i<s; ++i) {
 				for(int j=0; j<s; ++j) {
-					tM<<((float)(rand()))/RAND_MAX;
+					pNC<<((float)(rand()))/RAND_MAX;
 				}
 			}
-			_kalmanFilter.processNoiseCov = *pNC;
+			_kalmanFilter.processNoiseCov = pNC;
 
-			cv::Mat_<float>(s, s) tM;
+			cv::Mat_<float> tM(s, s);
 			for(int i=0; i<=_degree; ++i) {
 				for(int k=0; k<i; ++k) {
 					tM<<0,0,0;
@@ -89,7 +97,7 @@ void Stream::push(Faze faze) {
 				}
 			}
 
-			_kalmanFilter.transitionMatrix = *tM;
+			_kalmanFilter.transitionMatrix = tM;
 
 			cv::setIdentity(_kalmanFilter.measurementMatrix);
 			cv::setIdentity(_kalmanFilter.processNoiseCov,cv::Scalar::all(1e-4));
@@ -100,14 +108,14 @@ void Stream::push(Faze faze) {
 			cv::Mat prediction = _kalmanFilter.predict();
 			for(int i=0; i<s; i+=3) {
 				if(i==0) {
-					_measurements[i] = vec[0];
-					_measurements[i+1] = vec[1];
-					_measurements[i+2] = vec[2];
+					_measurements(i) = vec[0];
+					_measurements(i+1) = vec[1];
+					_measurements(i+2) = vec[2];
 				}
 				else {
-					_measurements[i] = _measurements[i-3] - _measurementsOld[i-3];
-					_measurements[i+1] = _measurements[i-2] - _measurementsOld[i-2];
-					_measurements[i+2] = _measurements[i-1] - _measurementsOld[i-1];
+					_measurements(i) = _measurements(i-3) - _measurementsOld(i-3);
+					_measurements(i+1) = _measurements(i-2) - _measurementsOld(i-2);
+					_measurements(i+2) = _measurements(i-1) - _measurementsOld(i-1);
 				}
 			}
 

@@ -1,11 +1,14 @@
-g++ -c -g -I./include -I./src/dlib/all/source.cpp -ljpeg -mavx -lm -lpthread -lX11 -DDLIB_HAVE_BLAS -DNDEBUG  -DDLIB_JPEG_SUPPORT -DDLIB_HAVE_AVX  -O3 `pkg-config --cflags opencv` -o obj/fazeModel.o src/fazeModel.cpp
+g++ -c -g -I./include -I./src/dlib/all/source.cpp -ljpeg -mavx -lm -lpthread -lX11 -DDLIB_HAVE_BLAS -DNDEBUG  -DDLIB_JPEG_SUPPORT -DDLIB_HAVE_AVX  -O3 `pkg-config --cflags opencv` -o obj/fixedBin.o src/fixedBin.cpp
 cc1plus: warning: ./src/dlib/all/source.cpp: not a directory [enabled by default]
-g++ -c -g -I./include -I./src/dlib/all/source.cpp -ljpeg -mavx -lm -lpthread -lX11 -DDLIB_HAVE_BLAS -DNDEBUG  -DDLIB_JPEG_SUPPORT -DDLIB_HAVE_AVX  -O3 `pkg-config --cflags opencv` -o obj/pupilDetectionCDF.o src/pupilDetectionCDF.cpp
-cc1plus: warning: ./src/dlib/all/source.cpp: not a directory [enabled by default]
-g++ -c -g -I./include -I./src/dlib/all/source.cpp -ljpeg -mavx -lm -lpthread -lX11 -DDLIB_HAVE_BLAS -DNDEBUG  -DDLIB_JPEG_SUPPORT -DDLIB_HAVE_AVX  -O3 `pkg-config --cflags opencv` -o obj/pupilDetectionSP.o src/pupilDetectionSP.cpp
-cc1plus: warning: ./src/dlib/all/source.cpp: not a directory [enabled by default]
-g++ -c -g -I./include -I./src/dlib/all/source.cpp -ljpeg -mavx -lm -lpthread -lX11 -DDLIB_HAVE_BLAS -DNDEBUG  -DDLIB_JPEG_SUPPORT -DDLIB_HAVE_AVX  -O3 `pkg-config --cflags opencv` -o obj/util.o src/util.cpp
-cc1plus: warning: ./src/dlib/all/source.cpp: not a directory [enabled by default]
-g++ -c -g -I./include -I./src/dlib/all/source.cpp -ljpeg -mavx -lm -lpthread -lX11 -DDLIB_HAVE_BLAS -DNDEBUG  -DDLIB_JPEG_SUPPORT -DDLIB_HAVE_AVX  -O3 `pkg-config --cflags opencv` -o obj/main.o src/main.cpp
-cc1plus: warning: ./src/dlib/all/source.cpp: not a directory [enabled by default]
-g++ -o bin/faze obj/dlib.o obj/fazeModel.o obj/pupilDetectionCDF.o obj/pupilDetectionSP.o obj/util.o obj/main.o -ljpeg -mavx -lm -lpthread -lX11 `pkg-config --libs opencv` -DDLIB_HAVE_BLAS -DNDEBUG  -DDLIB_JPEG_SUPPORT -DDLIB_HAVE_AVX  -O3
+g++ -o bin/faze obj/dlib.o obj/fazeModel.o obj/fixedBin.o obj/fazeStream.o obj/pupilDetectionCDF.o obj/pupilDetectionSP.o obj/util.o obj/main.o -ljpeg -mavx -lm -lpthread -lX11 `pkg-config --libs opencv` -DDLIB_HAVE_BLAS -DNDEBUG  -DDLIB_JPEG_SUPPORT -DDLIB_HAVE_AVX  -O3
+obj/fazeStream.o: In function `Stream::push(Faze)':
+/home/aravind/Desktop/myproj/FaZe/src/fazeStream.cpp:45: undefined reference to `FixedBin<Faze>::push(Faze)'
+/home/aravind/Desktop/myproj/FaZe/src/fazeStream.cpp:50: undefined reference to `FixedBin<Faze>::filled()'
+obj/fazeStream.o: In function `Stream::Stream(int, int)':
+/home/aravind/Desktop/myproj/FaZe/src/fazeStream.cpp:31: undefined reference to `FixedBin<Faze>::FixedBin()'
+/home/aravind/Desktop/myproj/FaZe/src/fazeStream.cpp:36: undefined reference to `FixedBin<Faze>::FixedBin()'
+/home/aravind/Desktop/myproj/FaZe/src/fazeStream.cpp:37: undefined reference to `FixedBin<Faze>::assign(int)'
+obj/fazeStream.o: In function `Stream::filled()':
+/home/aravind/Desktop/myproj/FaZe/src/fazeStream.cpp:140: undefined reference to `FixedBin<Faze>::filled()'
+collect2: error: ld returned 1 exit status
+make: *** [bin/faze] Error 1

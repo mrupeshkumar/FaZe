@@ -11,7 +11,9 @@
 #include "dlib/image_processing/render_face_detections.h"
 #include "dlib/gui_widgets.h"
 
+#include "fixedBin.h"
 #include "fazeModel.h"
+#include "fazeStream.h"
 #include "util.h"
 #include "pupilDetectionCDF.h"
 #include "pupilDetectionSP.h"

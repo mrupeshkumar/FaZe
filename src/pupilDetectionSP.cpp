@@ -11,6 +11,7 @@
 #include "dlib/image_processing/render_face_detections.h"
 #include "dlib/gui_widgets.h"
 
+#include "fazeModel.h"
 #include "util.h"
 
 using namespace std;

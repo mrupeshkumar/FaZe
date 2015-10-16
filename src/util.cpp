@@ -11,7 +11,7 @@
 #include "dlib/image_processing/render_face_detections.h"
 #include "dlib/gui_widgets.h"
 
-#include "faceModel.h"
+#include "fazeModel.h"
 
 using namespace std;
 using namespace dlib;
@@ -187,7 +187,7 @@ void get_reverse_vector(std::vector<double> vec, std::vector<double>& vec_rot) {
 	vec_rot[2] = -vec[1]*sinx + vec[2]*cosx;
 }
 
-double get_conversion_factor (dlib::full_object_detection shape, Face face, double magnitude_normal, int mode) {
+double get_conversion_factor (dlib::full_object_detection shape, Faze face, double magnitude_normal, int mode) {
 	cv::Point p1, p2;
     //mode : 1 for left eye, 2 for right eye
 	if(mode == 1) {
@@ -201,7 +201,8 @@ double get_conversion_factor (dlib::full_object_detection shape, Face face, doub
 
 	double dx = p1.x - p2.x, dy = p1.y - p2.y;
 	double temp1, temp2, beta;
-	double n1 = face.normal[0], n2 = face.normal[1], n3 = face.normal[2];
+	std::vector<double> normal = face.getNormal();
+	double n1 = normal[0], n2 = normal[1], n3 = normal[2];
 	double beta_old = sqrt(dx*dx + dy*dy)/magnitude_normal;
 
 	temp1 = dx*dx*(1.0 - n2*n2);

@@ -11,16 +11,18 @@
 #include "dlib/image_processing/render_face_detections.h"
 #include "dlib/gui_widgets.h"
 
+#include "fazeModel.h"
 #include "util.h"
 
-void compute_vec_LR (cv::Point p1, cv::Point p2, Face face, std::vector<double>& LR) {
+void compute_vec_LR (cv::Point p1, cv::Point p2, Faze face, std::vector<double>& LR) {
 	double scale = 20.784/30.0;
+	std::vector<double> normal = face.getNormal();
 
 	LR[0] = p1.x - p2.x;
 	LR[1] = p1.y - p2.y;
 	LR[0] = LR[0]*scale;
 	LR[1] = LR[1]*scale;
-	LR[2] = -(LR[0]*face.normal[0] + LR[1]*face.normal[1])/face.normal[3];
+	LR[2] = -(LR[0]*normal[0] + LR[1]*normal[1])/normal[3];
 }
 
 void get_quadratic_solution (std::vector<double> coeff, double& solution, int mode) {
@@ -79,9 +81,9 @@ void get_section(cv::Point p1, cv::Point p2, cv::Point pupil, double& Y1, double
 //List : Y1, Y2 can be interchanged. Magnitudes of the vectors in real world may be wrong.
 //		 face.MAG_LR square changed to just face.MAG_LR.
 
-void compute_vec_CP(cv::Point p1, cv::Point p2, cv::Point pupil, cv::Rect rect, Face face, 
-	std::vector<double> vec_CR_u, double face.MAG_CR, std::vector<double> vec_LR_u, double face.MAG_LR, 
-	std::vector<double> vec_UD_u, double face.MAG_CP, std::vector<double>& vec_CP, double S2R, int mode) {
+void compute_vec_CP(cv::Point p1, cv::Point p2, cv::Point pupil, cv::Rect rect, Faze face, 
+	std::vector<double> vec_CR_u, double MAG_CR, std::vector<double> vec_LR_u, double MAG_LR, 
+	std::vector<double> vec_UD_u, double MAG_CP, std::vector<double>& vec_CP, double S2R, int mode) {
 	double Y1, Y2, H;
 	get_section(p1, p2, cv::Point(pupil.x + rect.x, pupil.y + rect.y), Y1, Y2, H);
 
@@ -117,19 +119,8 @@ bool vec_isnan(std::vector<double>& vec) {
 	return (1-f);
 }
 
-std::vector<double> computeGazeQE(Face face) {
-	std::vector<double> vec_r(3), vec_l(3), vec(3);
-	computeGaze_(face, face.MODE_LEFT, vec_l);
-	computeGaze_(face, face.MODE_RIGHT, vec_r);
 
-	vec[0] = (vec_l[0] + vec_r[0])/2.0;
-	vec[1] = (vec_l[1] + vec_r[1])/2.0;
-	vec[2] = (vec_l[2] + vec_r[2])/2.0;
-
-	return vec;
-}
-
-void computeGaze_ (Face face, int mode, std::vector<double>& vec_CP) {
+void computeGaze_ (Faze face, int mode, std::vector<double>& vec_CP) {
 	cv::Rect rect = cv::boundingRect(face.getDescriptors());
 	std::vector<double> vec_LR_u(3), vec_RP(3), vec_CR_u(3), vec_CM_u(3), vec_UD_u(3);
 	std::vector<double> vec_CP_l(3), vec_CP_r(3);
@@ -155,9 +146,11 @@ void computeGaze_ (Face face, int mode, std::vector<double>& vec_CP) {
 
 	//log_vec("LR", vec_LR_u);
 
-	vec_CM_u[0] = face.normal[0];
-	vec_CM_u[1] = face.normal[1];
-	vec_CM_u[2] = face.normal[2];
+	std::vector<double> normal = face.getNormal();
+
+	vec_CM_u[0] = normal[0];
+	vec_CM_u[1] = normal[1];
+	vec_CM_u[2] = normal[2];
 
 	cross_product(vec_CM_u, vec_LR_u, vec_UD_u);
 	make_unit_vector(vec_UD_u, vec_UD_u);
@@ -172,8 +165,12 @@ void computeGaze_ (Face face, int mode, std::vector<double>& vec_CP) {
 
 	//log_vec("CR", vec_CR_u);
 
+	cv::Point pupil = face.getPupil(face.INDEX_LEFT_EYE_PUPIL);
+
 	compute_vec_CP(p1, p2, pupil, rect, face, vec_CR_u, face.MAG_CR, vec_LR_u, face.MAG_LR,
 		vec_UD_u, face.MAG_CP, vec_CP_l, S2R, 2);
+
+	pupil = face.getPupil(face.INDEX_RIGHT_EYE_PUPIL);
 
 	compute_vec_CP(p1, p2, pupil, rect, face, vec_CR_u, face.MAG_CR, vec_LR_u, face.MAG_LR,
 		vec_UD_u, face.MAG_CP, vec_CP_r, S2R, 1);
@@ -191,6 +188,16 @@ void computeGaze_ (Face face, int mode, std::vector<double>& vec_CP) {
 		vec_CP[1] = (vec_CP_l[1] + vec_CP_r[1])/2.0;
 		vec_CP[2] = (vec_CP_l[2] + vec_CP_r[2])/2.0;
 	}
+}
 
-	return vec_CP;
+std::vector<double> computeGazeQE(Faze face) {
+	std::vector<double> vec_r(3), vec_l(3), vec(3);
+	computeGaze_(face, face.MODE_LEFT, vec_l);
+	computeGaze_(face, face.MODE_RIGHT, vec_r);
+
+	vec[0] = (vec_l[0] + vec_r[0])/2.0;
+	vec[1] = (vec_l[1] + vec_r[1])/2.0;
+	vec[2] = (vec_l[2] + vec_r[2])/2.0;
+
+	return vec;
 }

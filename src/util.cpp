@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/legacy/compat.hpp>
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
 #include "dlib/opencv.h"
 #include "dlib/image_processing/frontal_face_detector.h"
@@ -35,7 +35,7 @@ void read_vector_from_file(char* file_name, std::vector<std::vector<double> >& a
 		file_name	Name of the file to be read
 		arr 		Vector to be constructed, passed by reference
 	*/
-	
+
 	std::ifstream file_in(file_name);
 	std::string line;
 
@@ -100,7 +100,7 @@ double get_angle_between(cv::Point pt1, cv::Point pt2) {
 }
 
 void make_unit_vector(std::vector<double> vec, std::vector<double>& unit_vector) {
-	
+
 	double magnitude = 0;
 
 	for(int i=0;i<vec.size();i++) {

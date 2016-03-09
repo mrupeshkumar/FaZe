@@ -1,10 +1,11 @@
+
 #include <math.h>
 #include <stdlib.h>
 #include <string>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/legacy/compat.hpp>
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
 #include "dlib/opencv.h"
 #include "dlib/image_processing/frontal_face_detector.h"
@@ -14,6 +15,10 @@
 #include "fixedBin.h"
 #include "fazeModel.h"
 #include "fazeStream.h"
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
 
 // Force resize to 300, 300 as dlib faces are nearly square
 
@@ -38,7 +43,7 @@ void logMat(cv::Mat_<double> mat) {
 }
 
 void process(cv::Mat& mat, full_object_detection shape) {
-    
+
     for(int i=0; i<300; ++i) {
         for(int j=0; j<300; ++j) {
             mat.at<double>(i, j) = 0.0;
@@ -51,7 +56,7 @@ void process(cv::Mat& mat, full_object_detection shape) {
 
 int main(int argc, char** argv) {
 	Faze faze = Faze();
-    Stream stream(2, Stream(2).SMOOTH_KALMAN);
+  Stream stream(2, Stream::SMOOTH_KALMAN);
 	cv::VideoCapture cap(0);
 	cv::Mat frame_clr, frame;
 	image_window win, win1, win2;
@@ -74,7 +79,7 @@ int main(int argc, char** argv) {
 			double rx = 300.0/(face.right() - face.left());
 			double ry = 300.0/(face.bottom() - face.top());
 			rectangle faceResized = rectangle(face.left()*rx, face.top()*ry, face.right()*rx, face.bottom()*ry);
-			cv::Rect cvFaceRectResized = cv::Rect(faceResized.left(), faceResized.top(), 
+			cv::Rect cvFaceRectResized = cv::Rect(faceResized.left(), faceResized.top(),
 				faceResized.right() - faceResized.left(), faceResized.bottom() - faceResized.top());
 			cv::Size sizeNew = cv::Size(frame_clr.cols*rx, frame_clr.rows*ry);
 			cv::resize(frame_clr, frame_clr, sizeNew);
@@ -82,20 +87,20 @@ int main(int argc, char** argv) {
 			cv_image<bgr_pixel> cimg_clr(frame_clr);
 
 			cv::Mat frameResized;
-			cv::resize(frame, frameResized, sizeNew);			
+			cv::resize(frame, frameResized, sizeNew);
 			cv_image<unsigned char> cimg_gray_resized(frameResized);
 
 			//cout<<faceResized.right() - faceResized.left()<<", "<<faceResized.bottom() - faceResized.top()<<endl;
 			full_object_detection shape = pose_model(cimg_gray_resized, faceResized);
-			
+
 			faze.assign(shape, frame_clr);
 			faze.setOrigin(faze.ORIGIN_FACE_CENTRE);
 
-            stream.push(faze);
+      stream.push(faze);
 
 			std::vector<double> normal = stream.current().getNormal();
 			cout<<normal[0]<<","<<normal[1]<<","<<normal[2]<<endl;
-			
+
 			std::vector<cv::Point> mouthCtrsOut = faze.getDescriptors(faze.INDEX_MOUTH_OUTER, faze.DESCRIPTOR_LOCAL);
 			std::vector<cv::Point> mouthCtrsIn = faze.getDescriptors(faze.INDEX_MOUTH_INNER, faze.DESCRIPTOR_LOCAL);
 
@@ -144,7 +149,7 @@ int main(int argc, char** argv) {
             ptsIn.push_back(cv::Point2f(shape.part(0).x()-faceResized.left(), shape.part(0).y()-faceResized.top()));
             int ptX = 2*shape.part(28).x() - shape.part(8).x();
             int ptY = 2*shape.part(28).y() - shape.part(8).y();
-            ptsIn.push_back(cv::Point2f(ptX-faceResized.left(), 
+            ptsIn.push_back(cv::Point2f(ptX-faceResized.left(),
             	ptY-faceResized.top()));
             ptsIn.push_back(cv::Point2f(shape.part(16).x()-faceResized.left(),
              shape.part(16).y()-faceResized.top()));
@@ -157,7 +162,7 @@ int main(int argc, char** argv) {
             ptsOut.push_back(cv::Point2f(300, 150));
 
             rotMat = cv::getPerspectiveTransform(ptsIn, ptsOut);
-            
+
             cv::Mat v(3, 3, CV_64F, 0);
             std::vector<double> cr(3);
             cr[0] = normal[1];

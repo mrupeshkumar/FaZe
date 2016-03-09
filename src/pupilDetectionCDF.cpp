@@ -1,9 +1,9 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/legacy/compat.hpp>
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
 #include "dlib/opencv.h"
 #include "dlib/image_processing/frontal_face_detector.h"

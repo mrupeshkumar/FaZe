@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/legacy/compat.hpp>
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
 #include "dlib/opencv.h"
 #include "dlib/image_processing/frontal_face_detector.h"
@@ -225,7 +225,7 @@ void draw_eye_gaze(cv::Point pt, std::vector<double> vec_gaze, cv::Rect roi_eye,
 	cv::line(img, cv::Point(pt.x + roi_eye.x, pt.y + roi_eye.y), cv::Point(pt.x + del_x + roi_eye.x, pt.y + del_y + roi_eye.y), cv::Scalar(255, 255, 255), 1);
 }
 
-double get_z_component(double Cf_left, cv::Point pt_p_kalman, cv::Point pt_e_kalman, std::vector<double> vec_ce_kalman) {	
+double get_z_component(double Cf_left, cv::Point pt_p_kalman, cv::Point pt_e_kalman, std::vector<double> vec_ce_kalman) {
 	make_unit_vector(vec_ce_kalman, vec_ce_kalman);
 	double x, y, z, mag = Cf_left*13.101, z_comp;
 	x = pt_e_kalman.x - vec_ce_kalman[0]*mag;

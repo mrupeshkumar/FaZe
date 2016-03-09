@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/legacy/compat.hpp>
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
 #include "dlib/opencv.h"
 #include "dlib/image_processing/frontal_face_detector.h"
@@ -62,7 +62,7 @@ Faze::Faze() {
 }
 
 void Faze::assign(dlib::full_object_detection shape , cv::Mat image, int modePupil, int modeGaze) {
-	assert(modePupil == MODE_PUPIL_SP || modePupil == MODE_PUPIL_CDF || 
+	assert(modePupil == MODE_PUPIL_SP || modePupil == MODE_PUPIL_CDF ||
 		modeGaze == MODE_GAZE_VA || modeGaze == MODE_GAZE_QE);
 	faceShape = shape;
 	image.copyTo(imageColor);
@@ -114,7 +114,7 @@ void Faze::computeNormal() {
 	cv::Point noseTip = cv::Point(faceShape.part(30).x(), faceShape.part(30).y());
 	cv::Point noseBase = cv::Point(faceShape.part(33).x(), faceShape.part(33).y());
 
-	// symm angle - angle between the symmetry axis and the 'x' axis 
+	// symm angle - angle between the symmetry axis and the 'x' axis
 	symm_x = get_angle_between(noseBase, midEye);
 	// tilt angle - angle between normal in image and 'x' axis
 	tau = get_angle_between(noseBase, noseTip);
@@ -181,8 +181,8 @@ std::vector<double> Faze::getGaze() {
 }
 
 std::vector<cv::Point> Faze::getIntermediateDescriptors(int index) {
-	assert(index == INDEX_LEFT_EYE || index == INDEX_RIGHT_EYE || index == INDEX_LEFT_EYE_BROW || index == INDEX_RIGHT_EYE_BROW 
-		|| index == INDEX_NOSE_UPPER || index == INDEX_NOSE_LOWER || index == INDEX_MOUTH_OUTER || index == INDEX_MOUTH_INNER); 
+	assert(index == INDEX_LEFT_EYE || index == INDEX_RIGHT_EYE || index == INDEX_LEFT_EYE_BROW || index == INDEX_RIGHT_EYE_BROW
+		|| index == INDEX_NOSE_UPPER || index == INDEX_NOSE_LOWER || index == INDEX_MOUTH_OUTER || index == INDEX_MOUTH_INNER);
 
 	if (index == INDEX_LEFT_EYE) {
 		std::vector<cv::Point> leftEyePoints;
@@ -232,7 +232,7 @@ std::vector<cv::Point> Faze::getIntermediateDescriptors(int index) {
 			mouthOuterPoints.push_back(cv::Point(faceShape.part(i).x(), faceShape.part(i).y()));
 		}
 		return mouthOuterPoints;
-	}	
+	}
 	else if (index == INDEX_MOUTH_INNER) {
 		std::vector<cv::Point> mouthInnerPoints;
 		for (int i=60; i<=67; i++){

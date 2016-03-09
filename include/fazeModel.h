@@ -41,7 +41,7 @@ public:
 	static const int INDEX_RIGHT_EYE = 2;
 	static const int INDEX_RIGHT_EYEBROW = 3;
 	static const int INDEX_NOSE_UPPER = 4;
-	static const int INDEX_NOSE_LOWER = 5;	
+	static const int INDEX_NOSE_LOWER = 5;
 	static const int INDEX_MOUTH_OUTER = 6;
 	static const int INDEX_MOUTH_INNER = 7;
 	static const int INDEX_LEFT_EYE_PUPIL = 8;

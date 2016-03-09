@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/legacy/compat.hpp>
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
 #include "dlib/opencv.h"
 #include "dlib/image_processing/frontal_face_detector.h"
@@ -81,8 +81,8 @@ void get_section(cv::Point p1, cv::Point p2, cv::Point pupil, double& Y1, double
 //List : Y1, Y2 can be interchanged. Magnitudes of the vectors in real world may be wrong.
 //		 face.MAG_LR square changed to just face.MAG_LR.
 
-void compute_vec_CP(cv::Point p1, cv::Point p2, cv::Point pupil, cv::Rect rect, Faze face, 
-	std::vector<double> vec_CR_u, double MAG_CR, std::vector<double> vec_LR_u, double MAG_LR, 
+void compute_vec_CP(cv::Point p1, cv::Point p2, cv::Point pupil, cv::Rect rect, Faze face,
+	std::vector<double> vec_CR_u, double MAG_CR, std::vector<double> vec_LR_u, double MAG_LR,
 	std::vector<double> vec_UD_u, double MAG_CP, std::vector<double>& vec_CP, double S2R, int mode) {
 	double Y1, Y2, H;
 	get_section(p1, p2, cv::Point(pupil.x + rect.x, pupil.y + rect.y), Y1, Y2, H);
@@ -181,7 +181,7 @@ void computeGaze_ (Faze face, int mode, std::vector<double>& vec_CP) {
 	if(f1 || f2) {
 			vec_CP[0] = (vec_CP_l[0] + vec_CP_r[0]);
 			vec_CP[1] = (vec_CP_l[1] + vec_CP_r[1]);
-			vec_CP[2] = (vec_CP_l[2] + vec_CP_r[2]);		
+			vec_CP[2] = (vec_CP_l[2] + vec_CP_r[2]);
 	}
 	else {
 		vec_CP[0] = (vec_CP_l[0] + vec_CP_r[0])/2.0;

@@ -1,6 +1,6 @@
 # FaZe
 
-### A **Fa**ce analy**Ze**r which gives more information about face pose, gaze etc.
+### A *FA*ce analy*ZE*r which gives more information about face pose, gaze etc.
 
 ## Dependencies
 

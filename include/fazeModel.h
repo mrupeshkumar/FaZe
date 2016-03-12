@@ -10,21 +10,17 @@ private:
 	cv::Mat imageColor, imageGray;
 
 	double yaw, pitch, sigma, symm_x, theta, tau;
-	std::vector<double> normal, gaze;
+	std::vector<double> normal, gaze, localYAxis;
 
 	std::vector<cv::Point> descriptors;
-	/*
-		0 : INDEX_LEFT_EYE_PUPIL
-		1 : INDEX_RIGHT_EYE_PUPIL
-	*/
 
 	void computePupil(int mode);
-	void computeNormal();
+	void computeFacialParams();
 	void computeGaze(int mode);
-    std::vector<cv::Point> getIntermediateDescriptors(int index);
-    void relativeToOrigin(std::vector<cv::Point>& vec);
+  std::vector<cv::Point> getIntermediateDescriptors(int index);
+  void relativeToOrigin(std::vector<cv::Point>& vec);
 
-    friend class Stream;
+  friend class Stream;
 
 public:
 	static const int MODE_LEFT = 0;
@@ -62,16 +58,17 @@ public:
 
 	Faze();
 
-    void assign(dlib::full_object_detection shape, cv::Mat image, int modePupil = MODE_PUPIL_SP, int modeGaze = MODE_GAZE_VA);
+  void assign(dlib::full_object_detection shape, cv::Mat image, int modePupil = MODE_PUPIL_SP, int modeGaze = MODE_GAZE_VA);
 
-    cv::Point getPupil(int mode);
-    std::vector<cv::Point> getDescriptors(int index, int mode = DESCRIPTOR_GLOBAL);
-    std::vector<double> getGaze();
-    std::vector<double> getNormal();
-    dlib::full_object_detection getShape();
+  cv::Point getPupil(int mode);
+  std::vector<cv::Point> getDescriptors(int index, int mode = DESCRIPTOR_GLOBAL);
+  std::vector<double> getGaze();
+  std::vector<double> getNormal();
+	cv::viz::WPlane getFacialPlane(cv::Size2d size = cv::Size2d(1.5, 2.0), cv::viz::Color color = cv::viz::Color::gold());
+  dlib::full_object_detection getShape();
 
-    void setOrigin(cv::Point origin);
-    void setOrigin(int mode);
+  void setOrigin(cv::Point origin);
+  void setOrigin(int mode);
 };
 
 #endif

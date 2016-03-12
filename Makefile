@@ -16,7 +16,7 @@ LDFLAGS = -ljpeg -mavx -lm -lpthread -lX11 `pkg-config --libs opencv` -DDLIB_HAV
 # $(VAR) gives value of the variable.
 # $@ stores the target
 # $^ stores the dependency
-# all: bin/oic bin/facegesmatch bin/facegescreate bin/facegeslisten
+all: bin/faze
 
 bin/faze: obj/dlib.o obj/fazeModel.o obj/fixedBin.o obj/fazeStream.o obj/pupilDetectionCDF.o obj/pupilDetectionSP.o obj/util.o obj/main.o
 	$(CXX) -o $@ $^ $(LDFLAGS)

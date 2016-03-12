@@ -5,6 +5,7 @@
 #include "opencv2/core/utility.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
+#include "opencv2/viz.hpp"
 
 #include "dlib/opencv.h"
 #include "dlib/image_processing/frontal_face_detector.h"
@@ -71,9 +72,11 @@ void Faze::assign(dlib::full_object_detection shape , cv::Mat image, int modePup
 	descriptors.clear();
 	normal.clear();
 	normal.resize(3);
+	localYAxis.clear();
+	localYAxis.resize(3);
 
 	computePupil(modePupil);
-	computeNormal();
+	computeFacialParams();
 	computeGaze(modeGaze);
 }
 
@@ -104,7 +107,7 @@ dlib::full_object_detection Faze::getShape() {
 	return faceShape;
 }
 
-void Faze::computeNormal() {
+void Faze::computeFacialParams() {
 	cv::Point midEye = get_mid_point(cv::Point(faceShape.part(39).x(), faceShape.part(39).y()),
 		cv::Point(faceShape.part(40).x(), faceShape.part(40).y()));
 
@@ -113,6 +116,9 @@ void Faze::computeNormal() {
 
 	cv::Point noseTip = cv::Point(faceShape.part(30).x(), faceShape.part(30).y());
 	cv::Point noseBase = cv::Point(faceShape.part(33).x(), faceShape.part(33).y());
+	cv::Point noseTopTip = cv::Point(faceShape.part(27).x(), faceShape.part(27).y());
+
+	cv::Point ly = noseTopTip - noseTip;
 
 	// symm angle - angle between the symmetry axis and the 'x' axis
 	symm_x = get_angle_between(noseBase, midEye);
@@ -127,6 +133,25 @@ void Faze::computeNormal() {
 	normal[0] = (sin(sigma))*(cos((360 - tau)*(PI/180.0)));
 	normal[1] = (sin(sigma))*(sin((360 - tau)*(PI/180.0)));
 	normal[2] = -cos(sigma);
+
+	double ly_z, mag;
+	if( !normal[2] ) {
+		ly_z = 0.0;
+		mag = std::sqrt(ly.x*ly.x + ly.y*ly.y);
+		localYAxis[0] = ly.x/mag;
+		localYAxis[1] = ly.y/mag;
+		localYAxis[2] = ly_z;
+	}
+	else {
+		ly_z = -1.0*(ly.x*normal[0] + ly.y*normal[1]);
+		ly_z /= normal[2];
+		mag = std::sqrt(ly.x*ly.x + ly.y*ly.y + ly_z*ly_z);
+		localYAxis[0] = ly.x/mag;
+		localYAxis[1] = ly.y/mag;
+		localYAxis[2] = ly_z/mag;
+	}
+
+	std::cout << localYAxis[0] << " " << localYAxis[1] << " " << localYAxis[2] << std::endl;
 
 	pitch = acos(sqrt((normal[0]*normal[0] + normal[2]*normal[2])/(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2])));
 	if((noseTip.y - noseBase.y) < 0) {
@@ -169,6 +194,11 @@ void Faze::setOrigin(int mode) {
 
 std::vector<double> Faze::getNormal() {
 	return normal;
+}
+
+cv::viz::WPlane Faze::getFacialPlane(cv::Size2d size, cv::viz::Color color) {
+	return cv::viz::WPlane(cv::Vec3d(0.0, 0.0, 0.0), cv::Vec3d(normal[0], normal[1], normal[2]),
+												 cv::Vec3d(localYAxis[0], localYAxis[1], localYAxis[2]), size, color);
 }
 
 cv::Point Faze::getPupil(int mode) {

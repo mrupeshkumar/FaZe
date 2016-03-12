@@ -1,0 +1,1 @@
+g++ -ggdb "$1" `pkg-config --cflags opencv` -o "$2" `pkg-config --libs opencv`

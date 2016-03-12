@@ -8,6 +8,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/video/video.hpp"
+#include "opencv2/viz.hpp"
 
 #include "dlib/opencv.h"
 #include "dlib/image_processing/frontal_face_detector.h"
@@ -42,7 +43,6 @@ Stream::Stream(int degree, int smooth) {
 	_kalmanFilter = cv::KalmanFilter((_degree+1)*3, (_degree+1)*3, 0);
 	_measurements((_degree+1)*3, 1);
 	_measurementsOld((_degree+1)*3, 1);
-	std::cout<<_measurements.elemSize()<< " ";
 }
 
 void Stream::push(Faze faze) {

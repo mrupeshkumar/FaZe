@@ -75,8 +75,8 @@ void Faze::assign(dlib::full_object_detection shape , cv::Mat image, int modePup
 	localYAxis.clear();
 	localYAxis.resize(3);
 
-	computePupil(modePupil);
 	computeFacialParams();
+	computePupil(modePupil);
 	computeGaze(modeGaze);
 }
 
@@ -151,8 +151,6 @@ void Faze::computeFacialParams() {
 		localYAxis[2] = ly_z/mag;
 	}
 
-	std::cout << localYAxis[0] << " " << localYAxis[1] << " " << localYAxis[2] << std::endl;
-
 	pitch = acos(sqrt((normal[0]*normal[0] + normal[2]*normal[2])/(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2])));
 	if((noseTip.y - noseBase.y) < 0) {
 		pitch = -pitch;
@@ -198,7 +196,7 @@ std::vector<double> Faze::getNormal() {
 
 cv::viz::WPlane Faze::getFacialPlane(cv::Size2d size, cv::viz::Color color) {
 	return cv::viz::WPlane(cv::Vec3d(0.0, 0.0, 0.0), cv::Vec3d(normal[0], normal[1], normal[2]),
-												 cv::Vec3d(localYAxis[0], localYAxis[1], localYAxis[2]), size, color);
+												 cv::Vec3d(0.0, 1.0, 0.0), size, color);
 }
 
 cv::Point Faze::getPupil(int mode) {

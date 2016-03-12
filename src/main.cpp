@@ -81,22 +81,7 @@ int main(int argc, char** argv) {
 
 		if((int)faces.size() != 0) {
 			rectangle face = faces[0];
-
-			// NO RESIZING NEEDED
-
-			// double rx = 300.0/(face.right() - face.left());
-			// double ry = 300.0/(face.bottom() - face.top());
-			// rectangle faceResized = rectangle(face.left()*rx, face.top()*ry, face.right()*rx, face.bottom()*ry);
-			// cv::Rect cvFaceRectResized = cv::Rect(faceResized.left(), faceResized.top(),
-			// 	faceResized.right() - faceResized.left(), faceResized.bottom() - faceResized.top());
-			// cv::Size sizeNew = cv::Size(frame_clr.cols*rx, frame_clr.rows*ry);
-			// cv::resize(frame_clr, frame_clr, sizeNew);
-
 			cv_image<bgr_pixel> cimg_clr(frame_clr);
-
-			// cv::Mat frameResized;
-			// cv::resize(frame, frameResized, sizeNew);
-			// cv_image<unsigned char> cimg_gray_resized(frameResized);
 
 			full_object_detection shape = pose_model(cimg_gray, face);
 
@@ -113,9 +98,6 @@ int main(int argc, char** argv) {
 				vizWin1.showWidget("Plane Widget", faze.getFacialPlane());
 				vizWin1.spinOnce(1, true);
 			#endif
-    }
-    else {
-      	//cout<<"No faces"<<endl;
     }
   }
   return 0;

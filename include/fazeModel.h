@@ -32,6 +32,9 @@ public:
 	static const int MODE_GAZE_VA = 0;
 	static const int MODE_GAZE_QE = 1;
 
+	static const int MODE_IMAGE_GRAY = 0;
+	static const int MODE_IMAGE_RGB = 1;
+
 	static const int INDEX_LEFT_EYE = 0;
 	static const int INDEX_LEFT_EYEBROW = 1;
 	static const int INDEX_RIGHT_EYE = 2;
@@ -66,6 +69,8 @@ public:
   std::vector<double> getNormal();
 	cv::viz::WPlane getFacialPlane(cv::Size2d size = cv::Size2d(1.5, 2.0), cv::viz::Color color = cv::viz::Color::gold());
   dlib::full_object_detection getShape();
+
+	cv::Mat getImage(int mode = MODE_IMAGE_GRAY);
 
   void setOrigin(cv::Point origin);
   void setOrigin(int mode);

@@ -284,3 +284,13 @@ std::vector<cv::Point> Faze::getDescriptors(int index, int mode) {
 		relativeToOrigin(vec);
 	return vec;
 }
+
+cv::Mat getImage(int mode) {
+	assert(mode == MODE_IMAGE_GRAY || mode == MODE_IMAGE_RGB);
+	if( mode == MODE_IMAGE_GRAY ) return imageGray;
+	else return imageGray;
+}
+
+void configure(cv::Mat src, dlib::full_object_detection srcShape, cv::Mat & dst) {
+
+}
